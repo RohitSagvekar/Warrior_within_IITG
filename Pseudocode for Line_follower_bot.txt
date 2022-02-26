@@ -2,16 +2,16 @@
 
 Initialize string variable 'lcdg'
 
-Initialize 2 dimensional array bedMap which'll store the address of each bed from terminus
+Initialize 2 dimensional array bedMap which'll store the address of each bed from terminus/docking position
 
 
-Declare a function which returns an integer and takes input as an array
+Declare a function which returns an integer which represents length of array and takes input as an array 
     FOR i = 0 to 50
         IF the i'th value in the input array is 'A'
             RETURN i
 
 
-Initialize 1 dimensional array 'presentLocation' which'll store the current location of bot from terminus
+Initialize 1 dimensional array 'presentLocation' which'll store the current location of bot from terminus/docking position
 
 Initialize 1 dimensional array 'tempAddress' which'll denote the turns the robot has to take to reach next bed
 
@@ -57,7 +57,7 @@ Initalize integer variable 'nodeTime'
 
 //Initializing the various flags in this section
 Initalize flag 'stationFlag' which'll be raised when bot reaches a station/bed
-Initalize flag 'terminusFlag' which'll be raised when bot reaches the terminus
+Initalize flag 'terminusFlag' which'll be raised when bot reaches the terminus/docking position
 Initalize flag 'mapFlag' which'll be raised when bot is in mapping mode
 Initalize flag 'moveFlag' which'll be raised when bot is in moving mode
 Initalize flag 'xFlag' which'll be raised when the bot encounters a four-way junction
@@ -72,11 +72,11 @@ Initalize flag 'shortpathFlag' which'll be raised when bot needs to shorten the 
 Initalize function turnLeft() which'll make bot turn left 90 degrees
 Initalize function turnRight() which'll make bot turn right 90 degrees
 Initalize function turnStraight() which'll make bot move ahead from a junction
-Initalize function turnBack() which'll make bot 
+Initalize function turnBack() which'll make bot turn back 180 degrees and move a little forward
 Initalize function goAhead() which'll ensure robot stays on track with the path always between IR sensors 2 and 4
 Initalize function goBack() which'll cause the bot to reverse
-Initalize function straightCheck which'll move the bot a little forward to differentiate between station, junction and terminus
-Initalize function backCheck to come back after straightCheck
+Initalize function straightCheck() which'll move the bot a little forward to differentiate between station, junction and terminus
+Initalize function backCheck() to come back after straightCheck
 
 Initalize function detectNode() which'll classify the type of junction the robot is at
 Initalize function shortPath() which'll make sure the previous path is cleared so that each row of bedMap is the address to that bed from the terminus
