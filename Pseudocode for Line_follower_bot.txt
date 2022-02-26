@@ -1,3 +1,154 @@
 //Pseudocode for Line_follower_bot.ino
 
-Hello
+Initialize string variable 'lcdg'
+
+Initialize 2 dimensional array bedMap which'll store the address of each bed from terminus
+
+
+Declare a function which returns an integer and takes input as an array
+    FOR i = 0 to 50
+        IF the i'th value in the input array is 'A'
+            RETURN i
+
+
+Initialize 1 dimensional array 'presentLocation' which'll store the current location of bot from terminus
+
+Initialize 1 dimensional array 'tempAddress' which'll denote the turns the robot has to take to reach next bed
+
+Initalize 1 dimensional array 'targetLocations' which'll hold the bed numbers which the bot has to visit
+
+Initalize 'numberTarget' which is length of array 'targetLocations'
+Initalize 'currentTurn' which is the number of turns the robot has taken while going from one bed to another
+Initialize 'currentBed' which is the number of the bed it just left
+Initalize 'Bn' (BedNumber), the number of beds it has visited
+Initialize 'Tn' (TurnNumber), the number of turns it has taken
+
+//Declaring the pin numbers
+Declare pin 3 as 1st pin of 1st motor
+Declare pin 2 as 2nd pin of 1st motor
+Declare pin 4 as 1st pin of 2nd motor
+Declare pin 5 as 2nd pin of 2nd motor
+Declare pin 6 as data input of 1st IR Sensor
+Declare pin 7 as data input of 2nd IR Sensor
+Declare pin 8 as data input of 3rd IR Sensor
+Declare pin 9 as data input of 4th IR Sensor
+Declare pin 10 as data input of 5th IR Sensor
+Declare pin  as 1st pin of drawer motor
+Declare pin  as 2nd pin of drawer motor
+
+Declare pins 11, 12, 13, 14, 15, 16 as pins for the LCD display
+
+Initialize string variable screen_print1 which'll show the first message
+Initialize string variable screen_print2 which'll show the second message
+
+Initialize pin for LED
+Initalize pin for temperature
+Initialize integer variable 'temp' for temperature
+Initalize integer variable 'dur' for duration that the drawer will be open
+
+
+Initialize five integer variables to store readings of the 5 IR sensors
+Initalize five integer variables to store the previous readings of IR sensors
+
+Initalize integer variable 'stopTime' which is the time between reading IR sensor values
+Initalize integer variable 'turnTime' which is time taken to take a right turn
+Initalize integer variable 'nodeTime'
+
+
+//Initializing the various flags in this section
+Initalize flag 'stationFlag' which'll be raised when bot reaches a station/bed
+Initalize flag 'terminusFlag' which'll be raised when bot reaches the terminus
+Initalize flag 'mapFlag' which'll be raised when bot is in mapping mode
+Initalize flag 'moveFlag' which'll be raised when bot is in moving mode
+Initalize flag 'xFlag' which'll be raised when the bot encounters a four-way junction
+Initalize flag 'tStraightFlag' which'll be raised when the bot encounters a straight 3 way junction
+Initalize flag 'tLeftFlag' which'll be raised when the bot encounters a leftward 3 way junction
+Initalize flag 'tRightFlag' which'll be raised when the bot encounters a rightward 3 way junction
+Initalize flag 'lLeftFlag' which'll be raised when the bot encounters a leftward 2 way junction
+Initalize flag 'lRightFlag' which'll be raised when the bot encounters a rightward 2 junction
+Initalize flag 'shortpathFlag' which'll be raised when bot needs to shorten the address in tempAddress
+
+
+Initalize function turnLeft() which'll make bot turn left 90 degrees
+Initalize function turnRight() which'll make bot turn right 90 degrees
+Initalize function turnStraight() which'll make bot move ahead from a junction
+Initalize function turnBack() which'll make bot 
+Initalize function goAhead() which'll ensure robot stays on track with the path always between IR sensors 2 and 4
+Initalize function goBack() which'll cause the bot to reverse
+Initalize function straightCheck which'll move the bot a little forward to differentiate between station, junction and terminus
+Initalize function backCheck to come back after straightCheck
+
+Initalize function detectNode() which'll classify the type of junction the robot is at
+Initalize function shortPath() which'll make sure the previous path is cleared so that each row of bedMap is the address to that bed from the terminus
+Initalize function screen_print() which'll print given string on the LCD display
+Initalize function Drawer_out() which'll open the drawer for given number of milliseconds
+Initalize function Drawer_in() which'll close the drawer for given number of milliseconds
+Initalize function ledblink() which'll make the indicator LED blink
+
+VOID setup(), the setup loop
+    Initalize Motorpins, led as OUTPUT
+    Initalize Sensor pins, thermometer as input
+
+FOR i = 1 to 50
+    FOR j = 1 to 50
+        Assign the letter 'A' to all places in bedMap
+
+
+VOID LOOP() which will continue to run indefintely when arduino is turned on        
+    CALL readSensor() to read the input from the IR sensors
+    IF mapFlag is raised
+        goAhead following the road for stopTime milliseconds
+        CALL detectNode to check if bot is at a junction
+            IF the node allows a left turn
+                Turn left 
+                store 'L' in the Tn'th position of Bn'th row of bedMap
+                INCREMENT Tn by 1
+                IF shortpathFlag is raised
+                    CALL shortpath()
+            ELSE IF the node doesn't allow a left turn
+                Go straight
+                store 'S' in the Tn'th position of Bn'th row of bedMap
+                INCREMENT Tn by 1
+                IF shortpathFlag is raised
+                    CALL shortpath()
+            ELSE IF the terminusFlag is raised
+                Clear bedMap matrix
+                Reset Tn to 0
+                Lower mapFlag
+                CALL turnBack()
+            ELSE IF the stationFlag is raised
+                CALL turnBack()
+                INCREMENT Bn by 1
+                COPY Bn'th entry to the Bn+1st entry of bedMap
+                INCREMENT Tn by 1
+                IF last entry of bedMap is 'B'
+                    RAISE shortpathFlag
+                
+
+    IF moveFlag is raised  
+        CALL goAhead()
+        CALL detectNode()
+
+        IF it's the first bed
+            WHILE the entries in bedMap are a
+                COPY the address of the first bed in targetLocations to tempAddress
+        ELSE IF it's not the first bed
+            Reverse the entries of current address and copy those into tempAdress, add the rest of the entries from last commmon node to target bed
+
+        
+        IF a junction is detected
+            Take turn based on the tempAdress matrix
+
+        IF a station/bed is reached
+            PRINT the first message on LCD screen
+            PUSH out the drawer
+            TURN ON the led
+            WAIT for 500 milliseconds
+            PRINT the second message on LCD screen
+            PULL in the drawer
+            TAKE temperature reading
+            INCREMENT currentBed by 1
+            RESET currentTurn
+
+        LOWER all flags.
+                
