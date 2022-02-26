@@ -13,15 +13,25 @@
  *
  */
 
-/* detection of a decision junction T or X
- *
- *
- *
- */
-
 #include <LiquidCrystal.h>
+#include <Keypad.h>
 
-String lcdg;
+const int ROW_NUM = 4; //four rows
+const int COLUMN_NUM = 4; //four columns
+
+
+char keys[ROW_NUM][COLUMN_NUM] = {
+  {'1','2','3', 'A'},
+  {'4','5','6', 'B'},
+  {'7','8','9', 'C'},
+  {'*','0','#', 'D'}
+};
+
+byte pin_rows[ROW_NUM] = {11, 12, 13, 14}; //connect to the row pinouts of the keypad
+byte pin_column[COLUMN_NUM] = {15, 16, 17, 18}; //connect to the column pinouts of the keypad
+
+Keypad keypad = Keypad( makeKeymap(keys), pin_rows, pin_column, ROW_NUM, COLUMN_NUM );
+
 
 char bedMap[50][50]; // Ha toh bedSize yaha declare karenge. Will change that manually for bigger maps.
                      // Here there's another assumption that there arent a lot of unnecessary turns in the path.
@@ -62,16 +72,19 @@ int IRSensor5 = 10;
 int Dmotorpin1; // Drawer Motor Pins
 int Dmotorpin2;
 
-LiquidCrystal lcd(11, 12, 7, 6, 5, 4); // initializing the LCD object
+LiquidCrystal lcd(11, 12, 13, 14, 15, 16); // initializing the LCD object
 
 String screen_print1 = "MEDICINES"; // The strings to be displayed on LCD screen
 String screen_print2 = "temperature";
 
 int led1 = 3;
+int switchPin1 = 17; // Mapping mode
+int switchPin2 = 18; // Digital input mode
+int switchPin3 = 19; // Moving mode
 int temppin = A1;
 int temp;
-
 int dur = 10000;
+int isrpin = 20;
 
 // Path status variables
 int statusSensor1;
@@ -91,7 +104,6 @@ int turnTime = 50; // toh this is a new variable we have declared. We will fine 
 int nodeTime = 50; // This is for differentiation b/w station, junction and terminus
 
 // Flags//
-// int nodeFlag = 0; //the node status flags
 int stationFlag = 0;
 int terminusFlag = 0;
 int mapFlag = 0; // the two MODE flags. mapMode and moveMode
@@ -103,6 +115,7 @@ int tRightFlag = 0;
 int lLeftFlag = 0;
 int lRightFlag = 0;
 int shortpathFlag = 0;
+int dataInputFlag = 0;
 
 void readSensor()
 {
@@ -362,6 +375,7 @@ void setup()
   pinMode(IRSensor5, INPUT);
 
   lcd.begin(16, 2);
+  attachInterrupt(digitalPinToInterrupt(isrpin),Stop,HIGH);
   pinMode(Dmotorpin1, OUTPUT);
   pinMode(Dmotorpin2, OUTPUT);
   pinMode(led1, OUTPUT);
@@ -383,6 +397,13 @@ void loop()
   // One digitalRead statement here to check for mapFlag and moveFlag;
 
   readSensor();
+
+  if(switchPin1 == HIGH){
+    mapFlag = 1;
+  }
+  else if(switchPin3 == HIGH){
+    moveFlag =1;
+  }
 
   if (mapFlag == 1)
   {            // THIS IS THE MAPPING LOOP.
@@ -540,6 +561,14 @@ void loop()
     }
   }
 
+  if (dataInputFlag == 1){
+      char key = keypad.getKey();
+      int i=0;  //to store input
+      if (key){
+        targetLocations[i]=key;
+        i++;
+      }
+  }
   // Here we will include code to deactivate the flags which have been activated.
   delay(stopTime);
   stationFlag = 0;
@@ -550,4 +579,12 @@ void loop()
   tRightFlag = 0;
   lLeftFlag = 0;
   lRightFlag = 0;
+}
+
+void  Stop(){
+  screen_print("STOPPED");
+  digitalWrite(motor1pin1, LOW);
+  digitalWrite(motor1pin2, LOW);
+  digitalWrite(motor2pin1, LOW);
+  digitalWrite(motor2pin2, LOW);
 }
