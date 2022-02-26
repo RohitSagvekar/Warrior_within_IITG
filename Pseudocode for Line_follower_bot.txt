@@ -139,7 +139,7 @@ VOID LOOP() which will continue to run indefintely when arduino is turned on
         IF a junction is detected
             Take turn based on the tempAdress matrix
 
-        IF a station/bed is reached
+        IF a station/bed is reached (Using idea of finite state machine)
             PRINT the first message on LCD screen
             PUSH out the drawer
             TURN ON the led
